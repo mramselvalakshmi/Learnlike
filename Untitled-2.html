@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Themed Todo Thread App</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    /* Background Gradient Theme */
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #8e44ad, #3498db);
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    /* Glassmorphism Card */
+    .container {
+      width: 500px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(12px);
+      padding: 25px;
+      border-radius: 18px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+      border: 1px solid rgba(255,255,255,0.25);
+    }
+
+    h2 {
+      text-align: center;
+      color: white;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      font-size: 15px;
+      background: rgba(255,255,255,0.8);
+    }
+
+    button {
+      padding: 10px 14px;
+      background: #2ecc71;
+      color: white;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #27ae60;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 20px;
+    }
+
+    .task {
+      background: rgba(255,255,255,0.4);
+      backdrop-filter: blur(8px);
+      padding: 12px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      border: 1px solid rgba(255,255,255,0.5);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    .task-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .left-part {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .small-icon {
+      font-size: 14px;
+      cursor: pointer;
+      margin-left: 8px;
+      color: #34495e;
+    }
+
+    .small-icon:hover {
+      color: #3498db;
+    }
+
+    .completed {
+      text-decoration: line-through;
+      color: #555;
+    }
+
+    /* Reply Thread Box */
+    .thread-box {
+      margin-left: 40px;
+      margin-top: 10px;
+      padding-left: 12px;
+      border-left: 2px dashed rgba(255,255,255,0.7);
+    }
+
+    .reply-input {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .reply {
+      background: rgba(255,255,255,0.7);
+      padding: 8px;
+      border-radius: 8px;
+      margin-top: 6px;
+      border: 1px solid rgba(255,255,255,0.5);
+      font-size: 14px;
+      color: #2c3e50;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h2>Todo Thread App</h2>
+
+    <div class="input-row">
+      <input id="taskInput" type="text" placeholder="Enter task...">
+      <button onclick="addTask()">Add</button>
+    </div>
+
+    <ul id="taskList"></ul>
+  </div>
+
+  <script>
+    function addTask() {
+      let taskText = document.getElementById("taskInput").value.trim();
+      if (taskText === "") return;
+
+      let li = document.createElement("li");
+      li.className = "task";
+
+      li.innerHTML = `
+        <div class="task-header">
+          <div class="left-part">
+            <input type="checkbox" class="checkbox" onclick="toggleComplete(this)">
+            <span class="task-text">${taskText}</span>
+          </div>
+
+          <div>
+            <i class="fa-solid fa-reply small-icon" onclick="showReplyInput(this)"></i>
+            <i class="fa-solid fa-pen small-icon" onclick="editTask(this)"></i>
+            <i class="fa-solid fa-trash small-icon" onclick="deleteTask(this)"></i>
+          </div>
+        </div>
+
+        <div class="thread-box"></div>
+      `;
+
+      document.getElementById("taskList").appendChild(li);
+      document.getElementById("taskInput").value = "";
+    }
+
+    function toggleComplete(checkbox) {
+      let taskText = checkbox.parentElement.querySelector(".task-text");
+      checkbox.checked
+        ? taskText.classList.add("completed")
+        : taskText.classList.remove("completed");
+    }
+
+    function deleteTask(icon) {
+      icon.closest(".task").remove();
+    }
+
+    function editTask(icon) {
+      let taskText = icon.closest(".task").querySelector(".task-text");
+      let newText = prompt("Edit task:", taskText.textContent);
+      if (newText) taskText.textContent = newText;
+    }
+
+    function showReplyInput(icon) {
+      let threadBox = icon.closest(".task").querySelector(".thread-box");
+
+      threadBox.innerHTML = `
+        <div class="reply-input">
+          <input type="text" placeholder="Reply..." class="replyText">
+          <button onclick="addReply(this)">Post</button>
+        </div>
+      ` + threadBox.innerHTML;
+    }
+
+    function addReply(btn) {
+      let input = btn.parentElement.querySelector(".replyText");
+      let text = input.value.trim();
+      if (text === "") return;
+
+      let replyDiv = document.createElement("div");
+      replyDiv.className = "reply";
+      replyDiv.textContent = text;
+
+      btn.closest(".thread-box").appendChild(replyDiv);
+      input.value = "";
+    }
+  </script>
+</body>
+</html>
